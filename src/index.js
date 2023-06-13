@@ -1,30 +1,50 @@
 import { fetchBreeds, fetchCatByBreed } from './cat-api';
+import SlimSelect from 'slim-select';
+import Notiflix from 'notiflix';
+
+Notiflix.Notify.init({
+  width: '400px',
+  position: 'center-center',
+  fontSize: '20px',
+  borderRadius: '15px',
+  timeout: '2000',
+  clickToClose: 'true',
+});
 
 function populateBreedsSelect() {
   const selectElement = document.querySelector('select.breed-select');
   const loaderElement = document.querySelector('p.loader');
   const errorElement = document.querySelector('p.error');
 
-  selectElement.style.display = 'none'; // Приховуємо select
-  loaderElement.style.display = 'block'; // Показуємо loader
+  selectElement.style.display = 'none'; // - select
+  loaderElement.style.display = 'block'; // + loader
   errorElement.style.display = 'none';
 
   fetchBreeds()
     .then(breeds => {
-      breeds.forEach(breed => {
+      const options = breeds.map(breed => {
         const optionElement = document.createElement('option');
         optionElement.value = breed.id;
         optionElement.textContent = breed.name;
-        selectElement.appendChild(optionElement);
+        return optionElement;
       });
 
-      selectElement.style.display = 'block'; // Показуємо select
-      loaderElement.style.display = 'none'; // Приховуємо loader
+      options.forEach(option => {
+        selectElement.appendChild(option);
+      });
+
+      loaderElement.style.display = 'none'; // - loader
+      selectElement.style.display = 'block'; // + select
+
+      new SlimSelect({
+        select: '#breed-select-id',
+      });
     })
-    .catch(error => {
-      console.error(error);
-      loaderElement.style.display = 'none'; // Приховуємо loader
-      errorElement.style.display = 'block';
+    .catch(() => {
+      Notiflix.Notify.info(
+        'Oops! Something went wrong! Try reloading the page!'
+      );
+      loaderElement.style.display = 'none'; // - loader
     });
 }
 
@@ -51,8 +71,8 @@ function displayCatInfo(cat) {
   temperamentElement.textContent = `Temperament: ${cat[0].breeds[0].temperament}`;
   catInfoElement.appendChild(temperamentElement);
 
-  catInfoElement.style.display = 'block'; // Показуємо блок з інформацією про кота
-  loaderElement.style.display = 'none'; // Приховуємо loader
+  catInfoElement.style.display = 'block'; // + блок з інформацією про кота
+  loaderElement.style.display = 'none'; // - loader
 }
 
 function handleSelectChange() {
@@ -62,16 +82,15 @@ function handleSelectChange() {
 
   const breedId = selectElement.value;
 
-  //   selectElement.style.display = 'none'; // Приховуємо select
-  loaderElement.style.display = 'block'; // Показуємо loader
+  //   selectElement.style.display = 'none'; // - select
+  loaderElement.style.display = 'block'; // + loader
 
   fetchCatByBreed(breedId)
     .then(cat => {
       displayCatInfo(cat);
     })
-    .catch(error => {
-      console.error(error);
-      loaderElement.style.display = 'none'; // Приховуємо loader
+    .catch(() => {
+      loaderElement.style.display = 'none'; // - loader
       errorElement.style.display = 'block';
     });
 }
