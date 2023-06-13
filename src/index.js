@@ -1,5 +1,6 @@
 import { fetchBreeds, fetchCatByBreed } from './cat-api';
 import SlimSelect from 'slim-select';
+import 'slim-select/dist/slimselect.css';
 import Notiflix from 'notiflix';
 
 Notiflix.Notify.init({
@@ -37,7 +38,7 @@ function populateBreedsSelect() {
       selectElement.style.display = 'block'; // + select
 
       new SlimSelect({
-        select: '#breed-select-id',
+        select: '.breed-select',
       });
     })
     .catch(() => {
@@ -82,7 +83,6 @@ function handleSelectChange() {
 
   const breedId = selectElement.value;
 
-  //   selectElement.style.display = 'none'; // - select
   loaderElement.style.display = 'block'; // + loader
 
   fetchCatByBreed(breedId)
@@ -95,7 +95,6 @@ function handleSelectChange() {
     });
 }
 
-// Виклик функції після завантаження сторінки
 document.addEventListener('DOMContentLoaded', () => {
   populateBreedsSelect();
 
